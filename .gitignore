@@ -54,3 +54,6 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Añadir la carpeta ./data de la raíz del proyecto
+/data
