@@ -5,6 +5,10 @@ import { FileSystemService } from './modules/services/file_system.service';
 import { ClientController } from './modules/controllers/client.controller';
 import { ClientService } from './modules/services/client.service';
 import { Client } from './modules/models/database/client.entity';
+import { Hotel } from './modules/models/database/hotel.entity';
+import { HotelBooking } from './modules/models/database/hotel_booking.entity';
+import { HotelService } from './modules/services/hotel.service';
+import { HotelController } from './modules/controllers/hotel.controller';
 
 @Module({
   imports: [
@@ -12,24 +16,30 @@ import { Client } from './modules/models/database/client.entity';
       type: 'sqlite',
       database: 'database.sqlite',
       entities: [
-        Client
+        Client,
+        Hotel,
+        HotelBooking
       ],
       synchronize: true,
       logging: true,
     }),
     TypeOrmModule.forFeature([
-      Client
+      Client,
+      Hotel,
+      HotelBooking
     ]),
     ConfigModule.forRoot({
       isGlobal: true,
     })
   ],
   controllers: [
-    ClientController
+    ClientController,
+    HotelController
   ],
   providers: [
     FileSystemService,
-    ClientService
+    ClientService,
+    HotelService
   ],
 })
 export class AppModule { }

@@ -1,8 +1,8 @@
 import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
 import { HotelBooking } from './hotel_booking.entity';
 
-@Entity('Client')
-export class Client {
+@Entity('Hotel')
+export class Hotel {
 
     @PrimaryColumn()
     id: string;
@@ -14,11 +14,8 @@ export class Client {
     address: string;
 
     @Column({ type: 'text' })
-    phone: string;
-
-    @Column({ type: 'text' })
     createdDate: string;
 
-    @OneToMany(() => HotelBooking, (hotelBooking) => hotelBooking.client)
+    @OneToMany(() => HotelBooking, (hotelBooking) => hotelBooking.hotel)
     hotelBookings: HotelBooking[];
 }

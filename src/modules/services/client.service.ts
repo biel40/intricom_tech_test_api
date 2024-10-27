@@ -132,22 +132,63 @@ export class ClientService {
     }
 
     private _updateInFileSystem(id: string, data: any) {
-        const filePath = path.join(this.fsFolder, 'Client', `${id}.json`);
-        // Actualizar el archivo JSON correspondiente
-        // Implementa la lógica de actualización de archivos
+        const metadata = this.readMetadata();
+
+        const filePath = path.join(this.entityFolder, `${id}.json`);
+
+        if (fs.existsSync(filePath)) {
+            fs.writeFileSync(filePath, JSON.stringify({ id, ...data }, null, 2));
+            console.log('Cliente actualizado en FileSystem satisfactoriamente.');
+            return { id, ...data };
+        } else {
+            console.log('Cliente no encontrado en FileSystem.');
+            return { message: 'Cliente no encontrado en FileSystem.' };
+        }
     }
 
 
     // Métodos específicos para BB.DD
     private _findAllFromDatabase() {
-        // Implementa la lógica de consulta de todos los registros en la base de datos
+        try {
+            let clients = this._clientRepository.find();
+
+            return clients;
+        } catch (error) {
+            console.error('Error al obtener los clientes de la base de datos:', error);
+            return { message: 'Error al obtener los clientes de la base de datos.' };
+        }
     }
 
-    private _createInDatabase(data: any) {
-        // Implementa la lógica de creación en la base de datos
+    private async _createInDatabase(data: any) {
+        try {
+            const newClient = this._clientRepository.create(data);
+            await this._clientRepository.save(newClient);
+
+            console.log('Cliente creado en la base de datos satisfactoriamente.');
+            return newClient;
+        } catch (error) {
+            console.error('Error al crear el cliente en la base de datos:', error);
+            return { message: 'Error al crear el cliente en la base de datos.' };
+        }
     }
 
-    private _updateInDatabase(id: string, data: any) {
-        // Implementa la lógica de actualización en la base de datos
+    private async _updateInDatabase(id: string, data: any) {
+        try {
+            const client = await this._clientRepository.findOneBy({ id: id });
+
+            if (!client) {
+                console.log('Cliente no encontrado en la base de datos.');
+                return { message: 'Cliente no encontrado en la base de datos.' };
+            }
+
+            await this._clientRepository.update(id, data);
+
+            console.log('Cliente actualizado en la base de datos satisfactoriamente.');
+            
+            return { id, ...data };
+        } catch (error) {
+            console.error('Error al actualizar el cliente en la base de datos:', error);
+            return { message: 'Error al actualizar el cliente en la base de datos.' };
+        }
     }
 }
