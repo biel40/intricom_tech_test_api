@@ -32,8 +32,7 @@ export class ClientController {
         value: {
           name: 'John Doe',
           address: '123 Main St',
-          phone: '+1234567890',
-          createdDate: '2024-10-27T12:34:56.000Z',
+          phone: '+1234567890'
         },
       },
     },
