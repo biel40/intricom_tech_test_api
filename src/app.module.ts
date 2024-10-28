@@ -9,6 +9,8 @@ import { Hotel } from './modules/models/database/hotel.entity';
 import { HotelBooking } from './modules/models/database/hotel_booking.entity';
 import { HotelService } from './modules/services/hotel.service';
 import { HotelController } from './modules/controllers/hotel.controller';
+import { HotelBookingService } from './modules/services/hotel_booking.service';
+import { HotelBookingController } from './modules/controllers/hotel_booking.controller';
 
 @Module({
   imports: [
@@ -34,12 +36,14 @@ import { HotelController } from './modules/controllers/hotel.controller';
   ],
   controllers: [
     ClientController,
-    HotelController
+    HotelController,
+    HotelBookingController
   ],
   providers: [
     FileSystemService,
     ClientService,
-    HotelService
+    HotelService,
+    HotelBookingService
   ],
 })
 export class AppModule { }

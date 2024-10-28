@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Put, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { CreateClientRequestDto } from '../models/dto/create_client_request.dto';
 import { HotelService } from '../services/hotel.service';
 import { CreateHotelRequestDto } from '../models/dto/create_hotel_request.dto';
+import { UpdateHotelRequestDto } from '../models/dto/update_hotel_request.dto';
 
 @ApiTags('hotels')
 @Controller('hotels')
@@ -17,7 +17,7 @@ export class HotelController {
   @Get()
   @ApiOperation({ summary: 'Listar todos los registros de hoteles' })
   @ApiResponse({ status: 200, description: 'Lista de hoteles obtenida con éxito' })
-  public async getAllBookings() {
+  public async getAllHotels() {
     return this._hotelService.findAll();
   }
 
@@ -37,7 +37,7 @@ export class HotelController {
       },
     },
   })
-  public async createBooking(
+  public async createHotel(
     @Body() createHotelDto: CreateHotelRequestDto
   ) {
     return this._hotelService.create(createHotelDto);
@@ -48,8 +48,8 @@ export class HotelController {
   @ApiResponse({ status: 200, description: 'Hotel actualizado con éxito' })
   public async updateHotel(
     @Param('id') id: string,
-    @Body() updateHotelDto: any
+    @Body() updateHotelRequestDto: UpdateHotelRequestDto
   ) {
-    // return this._clientService.update(id, updateClientDto);
+    return this._hotelService.update(id, updateHotelRequestDto);
   }
 }

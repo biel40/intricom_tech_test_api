@@ -24,7 +24,7 @@ export class HotelService {
     ) {
         this.dataType = this._fileSystemService.getFileDataTypeConfig();
         this.fsFolder = this._fileSystemService.getFileSystemPath();
-        this.entityFolder = path.join(this.baseFolder, 'Client');
+        this.entityFolder = path.join(this.baseFolder, 'Hotel');
         this.metadataFile = path.join(this.entityFolder, '_metadata.json');
 
         if (this.dataType === 'FS') {
@@ -65,6 +65,25 @@ export class HotelService {
         }
     }
 
+    /**
+     * Método publico para actualizar un registro ya existente de hotel
+     * @param id Identificador del hotel a actualizar
+     * @param data Datos del hotel a actualizar
+     * @returns Promise<any>
+     * @memberof HotelService
+     * @public
+     * @async
+     * @method update
+     * @throws Error
+     * */
+    public async update(id: string, data: any) {
+        if (this.dataType === 'FS') {
+            return this._updateInFileSystem(id, data);
+        } else {
+            return this._updateInDatabase(id, data);
+        }
+    }
+
     private _initializeFileSystem() {
         if (!fs.existsSync(this.baseFolder)) {
             fs.mkdirSync(this.baseFolder);
@@ -83,12 +102,11 @@ export class HotelService {
     }
 
     private _findAllFromFileSystem() {
-        return new Promise((resolve, reject) => {
-            const data = fs.readFileSync(this.metadataFile, 'utf-8');
-            const metadata = JSON.parse(data);
-            const entities = metadata.entities;
+        const files = fs.readdirSync(this.entityFolder).filter((file) => file !== '_metadata.json');
 
-            resolve(entities);
+        return files.map((file) => {
+            const content = fs.readFileSync(path.join(this.entityFolder, file), 'utf-8');
+            return JSON.parse(content);
         });
     }
 
@@ -96,24 +114,58 @@ export class HotelService {
         return this._hotelRepository.find();
     }
 
+    private readMetadata() {
+        const metadata = fs.readFileSync(this.metadataFile, 'utf-8');
+        return JSON.parse(metadata);
+    }
+
+    private updateMetadata(totalRegistries: number, lastIndex: number) {
+        const updatedMetadata = { TOTAL_REGISTRIES: totalRegistries, LAST_INDEX: lastIndex };
+        fs.writeFileSync(this.metadataFile, JSON.stringify(updatedMetadata, null, 2));
+    }
+
     private _createInFileSystem(data: CreateHotelRequestDto) {
+        const metadata = this.readMetadata();
+
+        const newId = metadata.LAST_INDEX + 1;
+
+        metadata.TOTAL_REGISTRIES += 1;
+        metadata.LAST_INDEX = newId;
+
+        const filePath = path.join(this.entityFolder, `${newId}.json`);
+        fs.writeFileSync(filePath, JSON.stringify({ id: newId, ...data }, null, 2));
+
+        this.updateMetadata(metadata.TOTAL_REGISTRIES, metadata.LAST_INDEX);
+
+        console.log('Cliente creado en FileSystem satisfactoriamente.');
+        return { id: newId, ...data };
+    }
+
+    private _updateInFileSystem(id: string, data: any) {
         return new Promise((resolve, reject) => {
             const metadata = JSON.parse(fs.readFileSync(this.metadataFile, 'utf-8'));
-            const newEntity = {
-                id: metadata.lastId + 1,
+            const index = metadata.entities.findIndex((entity: any) => entity.id === parseInt(id, 10));
+
+            if (index === -1) {
+                reject(new Error('Entity not found'));
+            }
+
+            metadata.entities[index] = {
+                ...metadata.entities[index],
                 ...data
             };
 
-            metadata.lastId++;
-            metadata.entities.push(newEntity);
-
             fs.writeFileSync(this.metadataFile, JSON.stringify(metadata, null, 2));
 
-            resolve(newEntity);
+            resolve(metadata.entities[index]);
         });
     }
 
     private _createInDatabase(data: CreateHotelRequestDto) {
         return this._hotelRepository.save(data);
+    }
+
+    private _updateInDatabase(id: string, data: any) {
+        return this._hotelRepository.update(id, data);
     }
 }
