@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { HotelService } from '../services/hotel.service';
 import { CreateHotelRequestDto } from '../models/dto/create_hotel_request.dto';
 import { UpdateHotelRequestDto } from '../models/dto/update_hotel_request.dto';
+import { Hotel } from '../models/database/hotel.entity';
 
 @ApiTags('hotels')
 @Controller('hotels')
@@ -17,7 +18,7 @@ export class HotelController {
   @Get()
   @ApiOperation({ summary: 'Listar todos los registros de hoteles' })
   @ApiResponse({ status: 200, description: 'Lista de hoteles obtenida con éxito' })
-  public async getAllHotels() {
+  public async getAllHotels() : Promise<Hotel[]> {
     return this._hotelService.findAll();
   }
 

@@ -40,7 +40,7 @@ export class HotelBookingService {
      * @async
      * @method findAll
     */
-    public async findAll() {
+    public async findAll() : Promise<HotelBooking[]> {
         if (this.dataType === 'FS' || this.dataType === 'fs' || this.dataType === 'FileSystem') {
             return this._findAllFromFileSystem();
         } else {
@@ -148,14 +148,13 @@ export class HotelBookingService {
 
 
     // Métodos específicos para BB.DD
-    private _findAllFromDatabase() {
+    private _findAllFromDatabase() : Promise<HotelBooking[]> {
         try {
             let clients = this._hotelBookingRepository.find();
 
             return clients;
         } catch (error) {
-            console.error('Error al obtener los clientes de la base de datos:', error);
-            return { message: 'Error al obtener los clientes de la base de datos.' };
+            throw new Error('Error al obtener los clientes de la base de datos.');
         }
     }
 

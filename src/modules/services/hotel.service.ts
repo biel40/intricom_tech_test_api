@@ -40,7 +40,7 @@ export class HotelService {
      * @async
      * @method findAll
     */
-    public async findAll() {
+    public async findAll() : Promise<Hotel[]> {
         if (this.dataType === 'FS' || this.dataType === 'fs' || this.dataType === 'FileSystem') {
             return this._findAllFromFileSystem();
         } else {
@@ -110,7 +110,7 @@ export class HotelService {
         });
     }
 
-    private _findAllFromDatabase() {
+    private _findAllFromDatabase(): Promise<Hotel[]> {
         return this._hotelRepository.find();
     }
 

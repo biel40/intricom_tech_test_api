@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ClientService } from '../services/client.service';
 import { CreateClientRequestDto } from '../models/dto/create_client_request.dto';
+import { Client } from '../models/database/client.entity';
 
 @ApiTags('clients')
 @Controller('clients')
@@ -15,8 +16,8 @@ export class ClientController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todos los registros de clientes' })
-  @ApiResponse({ status: 200, description: 'Lista de clientes obtenida con éxito' })
-  public async getAllClients() {
+  @ApiResponse({ status: 200, description: 'Lista de clientes obtenida con éxito', type: Client, isArray: true })
+  public async getAllClients() : Promise<Client[]> {
     return this._clientService.findAll();
   }
 

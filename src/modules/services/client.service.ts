@@ -40,7 +40,7 @@ export class ClientService {
      * @async
      * @method findAll
     */
-    public async findAll() {
+    public async findAll() : Promise<Client[]> {
         if (this.dataType === 'FS' || this.dataType === 'fs' || this.dataType === 'FileSystem') {
             return this._findAllFromFileSystem();
         } else {
@@ -148,14 +148,14 @@ export class ClientService {
 
 
     // Métodos específicos para BB.DD
-    private _findAllFromDatabase() {
+    private _findAllFromDatabase() : Promise<Client[]> {
         try {
             let clients = this._clientRepository.find();
 
             return clients;
         } catch (error) {
             console.error('Error al obtener los clientes de la base de datos:', error);
-            return { message: 'Error al obtener los clientes de la base de datos.' };
+            throw new Error('Error al obtener los clientes de la base de datos.');
         }
     }
 
