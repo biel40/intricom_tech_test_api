@@ -6,6 +6,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { HotelBooking } from '../models/database/hotel_booking.entity';
 import { CreateHotelBookingRequestDto } from '../models/dto/create_hotel_booking_request.dto';
+import { HotelService } from './hotel.service';
+import { ClientService } from './client.service';
+import { Hotel } from '../models/database/hotel.entity';
+import { Client } from '../models/database/client.entity';
 
 @Injectable()
 export class HotelBookingService {
@@ -21,6 +25,9 @@ export class HotelBookingService {
 
         @InjectRepository(HotelBooking)
         private _hotelBookingRepository: Repository<HotelBooking>,
+
+        private _hotelService: HotelService,
+        private _clientService: ClientService
     ) {
         this.dataType = this._fileSystemService.getFileDataTypeConfig();
         this.fsFolder = this._fileSystemService.getFileSystemPath();
@@ -42,7 +49,9 @@ export class HotelBookingService {
     */
     public async findAll() : Promise<HotelBooking[]> {
         if (this.dataType === 'FS' || this.dataType === 'fs' || this.dataType === 'FileSystem') {
-            return this._findAllFromFileSystem();
+            let bookingsFromFs = this._findAllFromFileSystem();
+
+            return bookingsFromFs;
         } else {
             return this._findAllFromDatabase();
         }
@@ -95,13 +104,28 @@ export class HotelBookingService {
         }
     }
 
-    private _findAllFromFileSystem() {
+    private  _findAllFromFileSystem() : Promise<HotelBooking[]> {
         const files = fs.readdirSync(this.entityFolder).filter((file) => file !== '_metadata.json');
 
-        return files.map((file) => {
+        return Promise.all(files.map(async (file) => {
             const content = fs.readFileSync(path.join(this.entityFolder, file), 'utf-8');
-            return JSON.parse(content);
-        });
+
+            let contentParsed: any = JSON.parse(content);
+            const allHotels = await this._hotelService.findAll();
+
+            let hotel: Hotel = allHotels.find((hotel) => Number(hotel.id) === Number(contentParsed.hotelId));
+
+            const allClients = await this._clientService.findAll();
+            let client: Client = allClients.find((client) => Number(client.id) === Number(contentParsed.clientId));
+            
+            let hotelBookingCompleteInfo = {
+                ...JSON.parse(content),
+                hotel: hotel,
+                client: client
+            };
+
+            return hotelBookingCompleteInfo;
+        }));
     }
 
     private readMetadata() {

@@ -17,7 +17,7 @@ export class HotelController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todos los registros de hoteles' })
-  @ApiResponse({ status: 200, description: 'Lista de hoteles obtenida con éxito' })
+  @ApiResponse({ status: 200, description: 'Lista de hoteles obtenida con éxito', type: Hotel, isArray: true })
   public async getAllHotels() : Promise<Hotel[]> {
     return this._hotelService.findAll();
   }
