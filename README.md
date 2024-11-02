@@ -2,6 +2,10 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
+<p>
+  Para levantar la API en desarollo, se necesita tener un fichero de configuración .env con las variables de entorno necesarias para levantar. Se pueden extraer 
+  del archivo .env.example
+</p>
 
 ## Description
 
